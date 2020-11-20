@@ -4,11 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.DialogInterface
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.WpsInfo
-import android.net.wifi.p2p.*
+import android.net.wifi.p2p.WifiP2pConfig
+import android.net.wifi.p2p.WifiP2pDevice
+import android.net.wifi.p2p.WifiP2pInfo
+import android.net.wifi.p2p.WifiP2pManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -17,7 +19,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import java.io.IOException
-import java.io.InputStream
 import java.net.InetSocketAddress
 import java.net.Socket
 
@@ -157,7 +158,7 @@ class ClientAsyncTask(
         Log.d("BBLOG ASYNC", "Client LAUNCHED")
         val socket = Socket()
         val buf = ByteArray(1024)
-            var totoRes = ""
+        var totoRes = ""
         try {
             /**
              * Create a client socket with the host,
@@ -171,12 +172,12 @@ class ClientAsyncTask(
              * of the socket. This data is retrieved by the server device.
              */
             val inputStream = socket.getInputStream()
-            while (inputStream.read(buf).also { var len = it } != -1) {
-                Log.d("BBLOG", "ttotootot")
-                totoRes = buf.decodeToString()
-            }
 
-            inputStream.close()
+            inputStream.use {
+                it.read(buf)
+            }
+            totoRes = buf.decodeToString()
+
             //catch logic
         } catch (e: IOException) {
             Log.e("BBLOG", "err io client", e)
@@ -186,8 +187,17 @@ class ClientAsyncTask(
              * Clean up any open sockets when done
              * transferring or if an exception occurred.
              */
-            socket.takeIf { it.isConnected }?.apply {
-                close()
+
+            Log.d("BBLOG", "finally")
+            if (socket != null) {
+                if (socket.isConnected) {
+                    try {
+                        socket.close()
+                    } catch (e: IOException) {
+                        // Give up
+                        e.printStackTrace()
+                    }
+                }
             }
             return totoRes
         }
