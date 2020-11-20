@@ -8,12 +8,17 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.WpsInfo
 import android.net.wifi.p2p.*
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import java.io.IOException
+import java.io.InputStream
+import java.net.InetSocketAddress
+import java.net.Socket
 
 class RequestDiscoverActivity : BaseActivity() {
 
@@ -100,6 +105,7 @@ class RequestDiscoverActivity : BaseActivity() {
 
     override fun getConnectionInfo(info: WifiP2pInfo) {
         // no-op
+        if (info.)
     }
 
     private fun removeGroup() {
@@ -129,5 +135,62 @@ class RequestDiscoverActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         receiver?.also(::unregisterReceiver)
+    }
+}
+
+class ClientAsyncTask(
+    private val context: Context,
+    private val host: String,
+    private val port: Int
+) : AsyncTask<Void, Void, String?>() {
+
+    override fun doInBackground(vararg params: Void): String? {
+        val socket = Socket()
+        val buf = ByteArray(1024)
+            var totoRes = ""
+        try {
+            /**
+             * Create a client socket with the host,
+             * port, and timeout information.
+             */
+            socket.bind(null)
+            socket.connect((InetSocketAddress(host, port)), 500)
+
+            /**
+             * Create a byte stream from a JPEG file and pipe it to the output stream
+             * of the socket. This data is retrieved by the server device.
+             */
+            val inputStream = socket.getInputStream()
+            while (inputStream.read(buf).also { var len = it } != -1) {
+                totoRes = buf.decodeToString()
+            }
+
+            inputStream.close()
+            //catch logic
+        } catch (e: IOException) {
+            Log.d("BBLOG", "err io client")
+            //catch logic
+        } finally {
+            /**
+             * Clean up any open sockets when done
+             * transferring or if an exception occurred.
+             */
+            socket.takeIf { it.isConnected }?.apply {
+                close()
+            }
+            return totoRes
+        }
+        /**
+         * Create a server socket.
+         */
+    }
+
+    /**
+     * Start activity that can handle the JPEG image
+     */
+    override fun onPostExecute(result: String?) {
+        result?.run {
+            Log.d("BBLOG", result)
+        }
     }
 }

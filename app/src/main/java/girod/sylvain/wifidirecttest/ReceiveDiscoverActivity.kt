@@ -8,11 +8,15 @@ import android.content.pm.PackageManager
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
+import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
+import java.io.File
+import java.net.ServerSocket
 
 class ReceiveDiscoverActivity : BaseActivity() {
 
@@ -65,6 +69,10 @@ class ReceiveDiscoverActivity : BaseActivity() {
     }
 
     override fun getConnectionInfo(info: WifiP2pInfo) {
+        if (info.groupFormed) {
+            val asyncTask = ServerAsyncTask(this)
+            asyncTask.execute()
+        }
         // no-op
     }
 
@@ -107,5 +115,44 @@ class ReceiveDiscoverActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
         receiver?.also(::unregisterReceiver)
+    }
+}
+
+class ServerAsyncTask(
+    private val context: Context
+) : AsyncTask<Void, Void, Unit?>() {
+
+    override fun doInBackground(vararg params: Void): Unit? {
+        /**
+         * Create a server socket.
+         */
+        val serverSocket = ServerSocket(8888)
+        return serverSocket.use {
+            /**
+             * Wait for client connections. This call blocks until a
+             * connection is accepted from a client.
+             */
+            val client = serverSocket.accept()
+            /**
+             * If this code is reached, a client has connected and transferred data
+             * Save the input stream from the client as a JPEG file
+             */
+            val s = "Armstrong"
+
+            val inputstream = client.getInputStream()
+            client.getOutputStream().write(s.toByteArray())
+            serverSocket.close()
+        }
+    }
+
+    private fun File.doesNotExist(): Boolean = !exists()
+
+    /**
+     * Start activity that can handle the JPEG image
+     */
+    override fun onPostExecute(result: Unit?) {
+        result?.run {
+            Log.d("BBLOG", "Async task executed !")
+        }
     }
 }
