@@ -15,4 +15,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/quitGroupButtonReceive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quit group"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/receiveButton" />
+
+    <TextView
+        android:id="@+id/deviceNameReceive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Device name unknown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/quitGroupButtonReceive" />
 </androidx.constraintlayout.widget.ConstraintLayout>

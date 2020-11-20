@@ -6,14 +6,15 @@ import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.p2p.WifiP2pDevice
+import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 
-class ReceiveDiscoverActivity : AppCompatActivity() {
+class ReceiveDiscoverActivity : BaseActivity() {
 
     val intentFilter = IntentFilter().apply {
         addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
@@ -48,21 +49,63 @@ class ReceiveDiscoverActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.receiveButton).setOnClickListener {
-            receiver?.also {
-                registerReceiver(it, intentFilter)
-            }
-
             manager?.discoverPeers(channel, object : WifiP2pManager.ActionListener {
                 override fun onSuccess() {
                     Log.d("BBLOG", "discover success")
-                    receiver?.also(::unregisterReceiver)
                 }
 
                 override fun onFailure(reason: Int) {
                     Log.d("BBLOG", "discover fail with reason $reason")
-                    receiver?.also(::unregisterReceiver)
                 }
             })
         }
+        findViewById<Button>(R.id.quitGroupButtonReceive).setOnClickListener {
+            removeGroup()
+        }
+    }
+
+    override fun getConnectionInfo(info: WifiP2pInfo) {
+        // no-op
+    }
+
+    override fun choosePeer(devices: List<WifiP2pDevice>) {
+        // no-op
+    }
+
+    override fun updateDeviceName(name: String) {
+        findViewById<TextView>(R.id.deviceNameReceive).text = name
+    }
+
+    private fun removeGroup() {
+        manager?.removeGroup(channel, object : WifiP2pManager.ActionListener {
+            override fun onSuccess() {
+                manager?.stopPeerDiscovery(channel, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() {
+                        Log.d("BBLOG", "stopPeerDiscovery success")
+                    }
+
+                    override fun onFailure(reason: Int) {
+                        Log.d("BBLOG", "stopPeerDiscovery fail with reason $reason")
+                    }
+                })
+                Log.d("BBLOG", "removeGroup success")
+            }
+
+            override fun onFailure(reason: Int) {
+                Log.d("BBLOG", "removeGroup fail for reason $reason")
+            }
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        receiver?.also {
+            registerReceiver(it, intentFilter)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        receiver?.also(::unregisterReceiver)
     }
 }
