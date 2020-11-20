@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pDeviceList
 import android.net.wifi.p2p.WifiP2pManager
 import android.util.Log
@@ -20,6 +21,10 @@ class WifiDirectBroadcastReceiver(
         requireNotNull(context)
         requireNotNull(intent)
         when (intent.action) {
+            WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> {
+                val device: WifiP2pDevice? = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)
+                Log.d("BBLOG", "Current device name ${device?.deviceName}")
+            }
             WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> {
                 Log.d("BBLOG", "WIFI_P2P_STATE_CHANGED_ACTION")
                 val state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1)
