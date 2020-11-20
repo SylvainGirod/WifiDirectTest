@@ -7,11 +7,13 @@ import android.content.Intent
 import android.net.wifi.p2p.WifiP2pDeviceList
 import android.net.wifi.p2p.WifiP2pManager
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+
 
 class WifiDirectBroadcastReceiver(
     private val manager: WifiP2pManager,
     private val channel: WifiP2pManager.Channel,
-    private val activity: MainActivity
+    private val activity: AppCompatActivity
 ) : BroadcastReceiver() {
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context?, intent: Intent?) {
