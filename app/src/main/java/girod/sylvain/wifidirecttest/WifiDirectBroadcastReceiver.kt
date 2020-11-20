@@ -54,6 +54,7 @@ class WifiDirectBroadcastReceiver(
                 Log.d("BBLOG", "WIFI_P2P_CONNECTION_CHANGED_ACTION")
                 manager?.requestConnectionInfo(channel) {
                     Log.d("BBLOG", "Connection Info : $it")
+                    activity.getConnectionInfo(it)
                 }
             }
         }

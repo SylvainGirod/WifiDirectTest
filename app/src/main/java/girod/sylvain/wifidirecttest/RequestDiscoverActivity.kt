@@ -1,6 +1,7 @@
 package girod.sylvain.wifidirecttest
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
@@ -86,6 +87,7 @@ class RequestDiscoverActivity : BaseActivity() {
             }.show()
     }
 
+    @SuppressLint("MissingPermission")
     private fun connectToDevice(device: WifiP2pDevice) {
         val config = WifiP2pConfig().apply {
             deviceAddress = device.deviceAddress
@@ -105,7 +107,13 @@ class RequestDiscoverActivity : BaseActivity() {
 
     override fun getConnectionInfo(info: WifiP2pInfo) {
         // no-op
-        if (info.)
+        Log.e("BBLOG", "here is the error ??")
+        if (info.groupFormed) {
+            Log.d("BBLOG", "group formed")
+            val at = ClientAsyncTask(this, info.groupOwnerAddress.hostAddress, 8888)
+            at.execute()
+
+        }
     }
 
     private fun removeGroup() {
@@ -145,6 +153,7 @@ class ClientAsyncTask(
 ) : AsyncTask<Void, Void, String?>() {
 
     override fun doInBackground(vararg params: Void): String? {
+        Log.d("BBLOG ASYNC", "Client LAUNCHED")
         val socket = Socket()
         val buf = ByteArray(1024)
             var totoRes = ""
@@ -190,7 +199,7 @@ class ClientAsyncTask(
      */
     override fun onPostExecute(result: String?) {
         result?.run {
-            Log.d("BBLOG", result)
+            Log.e("BBLOG", "received $result")
         }
     }
 }

@@ -123,6 +123,7 @@ class ServerAsyncTask(
 ) : AsyncTask<Void, Void, Unit?>() {
 
     override fun doInBackground(vararg params: Void): Unit? {
+        Log.d("BBLOG ASYNC", "Server LAUNCHED")
         /**
          * Create a server socket.
          */
@@ -152,7 +153,7 @@ class ServerAsyncTask(
      */
     override fun onPostExecute(result: Unit?) {
         result?.run {
-            Log.d("BBLOG", "Async task executed !")
+            Log.e("BBLOG", "Async task executed !")
         }
     }
 }
