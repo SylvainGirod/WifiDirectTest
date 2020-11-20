@@ -70,8 +70,9 @@ class ReceiveDiscoverActivity : BaseActivity() {
 
     override fun getConnectionInfo(info: WifiP2pInfo) {
         if (info.groupFormed) {
-            val asyncTask = ServerAsyncTask(this)
-            asyncTask.execute()
+//            val asyncTask = ServerAsyncTask(this)
+            val at = ClientAsyncTask(this, info.groupOwnerAddress.hostAddress, 47243)
+            at.execute()
         }
         // no-op
     }
@@ -127,7 +128,7 @@ class ServerAsyncTask(
         /**
          * Create a server socket.
          */
-        val serverSocket = ServerSocket(8888)
+        val serverSocket = ServerSocket(47243)
         return serverSocket.use {
             /**
              * Wait for client connections. This call blocks until a

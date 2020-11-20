@@ -109,8 +109,9 @@ class RequestDiscoverActivity : BaseActivity() {
         // no-op
         Log.e("BBLOG", "here is the error ??")
         if (info.groupFormed) {
-            Log.d("BBLOG", "group formed")
-            val at = ClientAsyncTask(this, info.groupOwnerAddress.hostAddress, 8888)
+            Log.d("BBLOG", "group formed ${info.groupOwnerAddress.hostAddress}")
+//            val at = ClientAsyncTask(this, info.groupOwnerAddress.hostAddress, 8888)
+            val at = ServerAsyncTask(this)
             at.execute()
 
         }
@@ -163,7 +164,7 @@ class ClientAsyncTask(
              * port, and timeout information.
              */
             socket.bind(null)
-            socket.connect((InetSocketAddress(host, port)), 500)
+            socket.connect((InetSocketAddress(host, 47243)), 500)
 
             /**
              * Create a byte stream from a JPEG file and pipe it to the output stream
@@ -171,13 +172,14 @@ class ClientAsyncTask(
              */
             val inputStream = socket.getInputStream()
             while (inputStream.read(buf).also { var len = it } != -1) {
+                Log.d("BBLOG", "ttotootot")
                 totoRes = buf.decodeToString()
             }
 
             inputStream.close()
             //catch logic
         } catch (e: IOException) {
-            Log.d("BBLOG", "err io client")
+            Log.e("BBLOG", "err io client", e)
             //catch logic
         } finally {
             /**
